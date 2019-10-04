@@ -1,0 +1,20 @@
+<div class="container">
+  <div class="form-wrap">
+    <h3>Login</h3>
+    <div class="form-group">
+      <div class="spacer">
+        <label>Email
+          <input class="form-control" type="text" placeholder="Email" [(ngModel)]="email">
+        </label>
+      </div>
+      <div class="spacer">
+        <label>Password
+          <input type="text" placeholder="Name" [(ngModel)]="name" class="form-control"/>
+        </label>
+      </div>
+      <div class="spacer">
+        <button  type="submit" (click)="Login()">Login</button>
+      </div>
+    </div>
+  </div>
+</div>
