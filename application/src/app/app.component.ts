@@ -7,12 +7,13 @@ import { AuthService} from "./services/auth.service";
   styleUrls: ['./app.component.scss']
 })
 export class AppComponent {
+
+  currentToken: string;
   title = 'angular-jwt-project';
 
   constructor(private authService: AuthService ) {
+    this.authService.currentToken.subscribe(currentToken => this.currentToken = currentToken);
   }
-
-  logIn = this.authService.logIn;
 
   logout() {
     this.authService.logout();
