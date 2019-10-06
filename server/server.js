@@ -2,6 +2,7 @@ const cors = require('cors');
 const bodyParser = require('body-parser');
 const jwt = require('jsonwebtoken');
 const express = require('express');
+const randtoken = require('rand-token');
 
 const app = express();
 app.use(cors());
@@ -10,7 +11,7 @@ app.use(bodyParser.json());
 const tokenSecret = 'secret';
 const refreshTokenSecret = 'refreshSecret';
 const tokenList = {};
-const testUser = { email: 'kelvin@gmai.com', name: 'kelvin'};
+const testUser = { email: 'kelvin@gmail.com', name: 'kelvin'};
 
 app.post('/api/authenticate', (req, res) => {
   if (req.body) {
@@ -21,8 +22,8 @@ app.post('/api/authenticate', (req, res) => {
     };
 
     if (testUser.email === user.email && testUser.password === user.password) {
-      const token = jwt.sign(user, tokenSecret, {expiresIn: 900});
-      const refreshToken = jwt.sign(user, refreshTokenSecret, {expiresIn: 300});
+      const token = jwt.sign(user, tokenSecret, {expiresIn: 300});
+      const refreshToken = randtoken.uid(256);
       const response = {
         signed_user: user,
         token: token,
@@ -43,27 +44,27 @@ app.post('/api/authenticate', (req, res) => {
 
 });
 
-app.post('/token', (req, res) => {
-  let postData = req.body;
+app.get('/profile', (req, res) => {
+  let request = req.header('auth_token');
+  res.status(200).send('Profile information')
+})
 
-  if((postData.refreshToken) && (postData.refreshToken in tokenList)) {
-    let user = {
-      "email": postData.email,
-      "name": postData.name
-    };
+app.post('/refresh', function (req, res) {
+  const refreshToken = req.body.refreshToken;
 
-    const token = jwt.sign(user, tokenSecret, {expiresIn: 900});
-    const response = {
-      "token": token,
-    };
-    tokenList[postData.refreshToken].token = token;
-    res.status(200).json(response);
-  } else {
-    res.status(404).send('Invalid request')
+  if (refreshToken in refreshTokens) {
+    const user = {
+      'username': refreshTokens[refreshToken],
+      'role': 'admin'
+    }
+    const token = jwt.sign(user, SECRET, { expiresIn: 600 });
+    res.json({jwt: token})
+  }
+  else {
+    res.sendStatus(401);
   }
 });
 
-app.use(require('./tokenChecker'));
 
 app.get('/secure', (req,res) => {
   res.send('I am secured...')
